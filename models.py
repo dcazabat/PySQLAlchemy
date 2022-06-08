@@ -1,6 +1,6 @@
 from sqlalchemy import Column #Campo de la Tabla
 from sqlalchemy import ForeignKey # para mapear una clave externa a la tabla
-from sqlalchemy import Integer, String, Float # Tipos de datos de la tabla
+from sqlalchemy import Integer, String, Float, DateTime # Tipos de datos de la tabla
 
 from sqlalchemy.orm import relationship # Genera una relacion entre tablas
 
@@ -13,6 +13,7 @@ class User(Base):
     name = Column(String(30))
     fullname = Column(String(100))
     addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")
+    usercnxs = relationship("UserCnx", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"User(id={self.id!r}, name={self.name!r}, fullname={self.fullname!r})"
@@ -26,3 +27,13 @@ class Address(Base):
 
     def __repr__(self):
         return f"Address(id={self.id!r}, email_address={self.email_address!r})"
+
+class UserCnx(Base):
+    __tablename__ = "user_account_cnx"
+    id = Column(Integer, primary_key=True)
+    date_cnx = Column(DateTime)
+    user_id = Column(Integer, ForeignKey("user_account.id"), nullable=False)
+    user = relationship("User", back_populates="usercnxs")
+
+    def __repr__(self):
+        return f"UserCNX(id={self.id!r}, date_cnx={self.date_cnx!r})"

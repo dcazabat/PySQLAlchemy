@@ -3,8 +3,9 @@
 # o bien si al agregar ya existe el dato, lo repite, en las cosnultas
 # con "one()" si hay mas de un dato da error.
 
+from datetime import datetime
 from ast import stmt
-from models import User, Address
+from models import User, Address, UserCnx
 from db import engine, Base
 
 from sqlalchemy.orm import Session
@@ -18,6 +19,7 @@ def insert_data(engine):
             name="spongebob",
             fullname="Spongebob Squarepants",
             addresses=[Address(email_address="spongebob@sqlalchemy.org")],
+            usercnxs=[UserCnx(date_cnx=datetime.now())],
         )
         sandy = User(
             name="sandy",
@@ -27,7 +29,11 @@ def insert_data(engine):
                 Address(email_address="sandy@squirrelpower.org"),
             ],
         )
-        patrick = User(name="patrick", fullname="Patrick Star")
+        patrick = User(
+            name="patrick", 
+            fullname="Patrick Star",
+            usercnxs=[UserCnx(date_cnx=datetime.now())],
+        )
         session.add_all([spongebob, sandy, patrick])
         session.commit()
 
@@ -35,7 +41,7 @@ def select_all_data(engine):
 
     with Session(engine) as session:
 
-        stmt = select(User).where(User.name.in_(["spongebob", "sandy"]))
+        stmt = select(User).where(User.name.in_(["spongebob", "sandy", "patrick"]))
 
         for user in session.scalars(stmt):
             print(user)
@@ -89,11 +95,13 @@ def delete_user(engine):
         session.commit()
 
 def run():
+    # IMPORTANTE: Si insertamos datos 2 veces y estan repetidos el metodo select_filter_data no funciona.
+
     # insert_data(engine=engine)
-    select_all_data(engine=engine)
+    # select_all_data(engine=engine)
     # print(select_filter_data(engine=engine, name='sandy', address='sandy@sqlalchemy.org'))
     # modify_data(engine=engine)
-    delete_user(engine=engine)
+    # delete_user(engine=engine)
     # delete_data_other_table(engine=engine)
     pass
 
